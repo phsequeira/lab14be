@@ -31,35 +31,54 @@ describe('app routes', () => {
       return client.end(done);
     });
 
-    test('returns animals', async() => {
+    const fave = {
+      name: 'Parker',
+      portrayed: 'parker',
+      nickname: 'Parkers',
+      img: 'http://www.placekitten.com/300/300'
+    };
+    const myfav = {
+      ...fave,
+      owner_id: 2,
+      id: 4,
+    };
 
-      const expectation = [
-        {
-          'id': 1,
-          'name': 'bessie',
-          'coolfactor': 3,
-          'owner_id': 1
-        },
-        {
-          'id': 2,
-          'name': 'jumpy',
-          'coolfactor': 4,
-          'owner_id': 1
-        },
-        {
-          'id': 3,
-          'name': 'spot',
-          'coolfactor': 10,
-          'owner_id': 1
-        }
-      ];
+    test('make a new fave', async() => {
+
+      const fave = {
+        name: 'Parker',
+        portrayed: 'parker',
+        nickname: 'Parkers',
+        img: 'http://www.placekitten.com/300/300'
+      };
 
       const data = await fakeRequest(app)
-        .get('/animals')
+        .post('/api/favorites')
+        .send(fave)
+        .set('Authorization', token)
         .expect('Content-Type', /json/)
         .expect(200);
 
-      expect(data.body).toEqual(expectation);
+      expect(data.body[0]).toEqual(myfav);
     });
+
+    test('returns all favs for a given user', async() => {
+      const data = await fakeRequest(app)
+        .get('/api/favorites')
+        .set('Authorization', token)
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(data.body[0]).toEqual(myfav);
+    });
+
+    /*test('delets a favorite', async() => {
+      const data = await fakeRequest(app)
+        .delete('/api/favorites/4')
+        .set('Authorization', token)
+        .expect('Content-Type', /json/)
+        .expect(200);
+
+      expect(data.body).toEqual([]);
+    });*/
   });
 });
